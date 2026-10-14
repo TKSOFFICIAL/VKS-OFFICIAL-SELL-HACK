@@ -1,0 +1,6 @@
+{
+  "name": "VKS OFFICIAL × WINGO 1M - AI Multi-Engine",
+  "description": "White & Blue Luxury Wingo Prediction System with Multi-AI Neural Analysis, Firebase UTR Verification, and 3D Ball UI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
