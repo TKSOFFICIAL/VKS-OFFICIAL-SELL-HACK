@@ -25,7 +25,7 @@ import {
 } from '../constants';
 import { 
   calculateMultiAiConsensus, 
-  getColor, 
+  getBigSmall, 
   MultiAiConsensus 
 } from '../services/multiAiEngine';
 import { 
@@ -57,8 +57,8 @@ interface MainPanelProps {
   onLogout: () => void;
 }
 
-const RED_POOL = [0, 2, 4, 6, 8];
-const GREEN_POOL = [1, 3, 5, 7, 9];
+const BIG_POOL = [5, 6, 7, 8, 9];
+const SMALL_POOL = [0, 1, 2, 3, 4];
 
 function getFrameClass(num: number): 'violet' | 'green' | 'red' {
   if (num === 0 || num === 5) return 'violet';
@@ -87,7 +87,7 @@ export const MainPanel: React.FC<MainPanelProps> = ({
 
   // Game & prediction state
   const [currentPeriod, setCurrentPeriod] = useState<string>('WAIT');
-  const [prediction, setPrediction] = useState<ColorPrediction>('RED');
+  const [prediction, setPrediction] = useState<ColorPrediction>('BIG');
   const [predictedNumbers, setPredictedNumbers] = useState<[number, number]>([2, 7]);
   const [activePattern, setActivePattern] = useState<string>('NEURAL CONSENSUS');
   const [patternConfidence, setPatternConfidence] = useState<number>(92);
@@ -115,7 +115,7 @@ export const MainPanel: React.FC<MainPanelProps> = ({
   // Refs for tracking processed periods
   const lastProcessedIssueRef = useRef<string>('');
   const lastPredictedPeriodRef = useRef<string>('');
-  const lockedPredRef = useRef<ColorPrediction>('RED');
+  const lockedPredRef = useRef<ColorPrediction>('BIG');
   const lockedNumbersRef = useRef<[number, number]>([2, 7]);
   const lockedPatternRef = useRef<string>('NEURAL CONSENSUS');
   const lossStreakRef = useRef<number>(0);
@@ -213,19 +213,19 @@ export const MainPanel: React.FC<MainPanelProps> = ({
     pred: ColorPrediction,
     nums: [number, number]
   ): { status: 'WIN' | 'LOSS' | 'JACKPOT'; isWin: boolean; isJackpot: boolean } => {
-    const isEven = RED_POOL.includes(resultNum);
-    const isOdd = GREEN_POOL.includes(resultNum);
+    const isBig = BIG_POOL.includes(resultNum);
+    const isSmall = SMALL_POOL.includes(resultNum);
     const isMatchExact = nums.includes(resultNum);
 
-    if (pred === 'RED') {
-      if (isEven) {
+    if (pred === 'BIG') {
+      if (isBig) {
         if (isMatchExact) return { status: 'JACKPOT', isWin: true, isJackpot: true };
         return { status: 'WIN', isWin: true, isJackpot: false };
       }
       if (isMatchExact) return { status: 'JACKPOT', isWin: true, isJackpot: true };
       return { status: 'LOSS', isWin: false, isJackpot: false };
     } else {
-      if (isOdd) {
+      if (isSmall) {
         if (isMatchExact) return { status: 'JACKPOT', isWin: true, isJackpot: true };
         return { status: 'WIN', isWin: true, isJackpot: false };
       }
@@ -299,7 +299,7 @@ export const MainPanel: React.FC<MainPanelProps> = ({
         );
 
         // SHOW FULL SCREEN POPUP RESULT (WIN / JACKPOT / LOSS)
-        const outcomeColor = getColor(resNum);
+        const outcomeColor = getBigSmall(resNum);
         setFullScreenPopup({
           type: status,
           period: latestShort,
@@ -703,9 +703,9 @@ export const MainPanel: React.FC<MainPanelProps> = ({
                 </div>
                 <div 
                   className={`text-5xl font-black font-orbitron tracking-[6px] my-1 ${
-                    prediction === 'RED'
-                      ? 'text-rose-600 drop-shadow-[0_4px_12px_rgba(239,68,68,0.4)]'
-                      : 'text-emerald-600 drop-shadow-[0_4px_12px_rgba(16,185,129,0.4)]'
+                    prediction === 'BIG'
+                      ? 'text-blue-600 drop-shadow-[0_4px_12px_rgba(37,99,235,0.4)]'
+                      : 'text-indigo-600 drop-shadow-[0_4px_12px_rgba(79,70,229,0.4)]'
                   }`}
                 >
                   {prediction}
@@ -730,13 +730,13 @@ export const MainPanel: React.FC<MainPanelProps> = ({
                     </div>
                   </div>
                   <span className="text-[8px] font-bold text-slate-500 uppercase">
-                    {RED_POOL.includes(predictedNumbers[0]) ? 'EVEN (RED)' : 'ODD (GREEN)'}
+                    {BIG_POOL.includes(predictedNumbers[0]) ? 'BIG (5-9)' : 'SMALL (0-4)'}
                   </span>
                 </div>
 
                 {/* Opp Ball */}
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-[9px] font-black text-emerald-600 tracking-widest">OPP</span>
+                  <span className="text-[9px] font-black text-indigo-600 tracking-widest">OPP</span>
                   <div className="pred-ball-wrap opp">
                     <div className="pred-ball-inner">
                       {BALL_IMAGES[predictedNumbers[1]] ? (
@@ -750,7 +750,7 @@ export const MainPanel: React.FC<MainPanelProps> = ({
                     </div>
                   </div>
                   <span className="text-[8px] font-bold text-slate-500 uppercase">
-                    {RED_POOL.includes(predictedNumbers[1]) ? 'EVEN (RED)' : 'ODD (GREEN)'}
+                    {BIG_POOL.includes(predictedNumbers[1]) ? 'BIG (5-9)' : 'SMALL (0-4)'}
                   </span>
                 </div>
               </div>
@@ -792,7 +792,7 @@ export const MainPanel: React.FC<MainPanelProps> = ({
                             <span className="truncate">{rep.name}</span>
                           </span>
                           <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${
-                            rep.predictedTrend === 'RED' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
+                            rep.predictedTrend === 'BIG' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-100 text-indigo-700'
                           }`}>
                             {rep.predictedTrend}
                           </span>
@@ -916,7 +916,7 @@ export const MainPanel: React.FC<MainPanelProps> = ({
                             {h.result ?? '?'}
                           </div>
                           <span className={`actual-size ${h.prediction}`}>
-                            {actualNum !== null ? getColor(actualNum) : '---'}
+                            {actualNum !== null ? getBigSmall(actualNum) : '---'}
                           </span>
                         </div>
 
@@ -1001,7 +1001,7 @@ export const MainPanel: React.FC<MainPanelProps> = ({
                           {h.result ?? '?'}
                         </div>
                         <span className={`actual-size ${h.prediction}`}>
-                          {actualNum !== null ? getColor(actualNum) : '---'}
+                          {actualNum !== null ? getBigSmall(actualNum) : '---'}
                         </span>
                       </div>
 

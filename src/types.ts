@@ -1,4 +1,4 @@
-export type ColorPrediction = 'RED' | 'GREEN';
+export type ColorPrediction = 'BIG' | 'SMALL';
 
 export interface Plan {
   price: number;
@@ -51,13 +51,12 @@ export interface AdminRequest {
 export interface PatternAnalysisResult {
   pattern: string;
   confidence: number;
-  nextTrend: 'RED' | 'GREEN' | null;
+  nextTrend: ColorPrediction | null;
 }
 
 export interface PredictionEngineResult {
-  trend: 'RED' | 'GREEN';
-  main: number;
-  opp: number;
+  trend: ColorPrediction;
+  numbers: [number, number];
   confidence: number;
   pattern: string;
   recoveryLevel?: number;
